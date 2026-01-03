@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐎</text></svg>" />
+    <meta name="theme-color" content="#ffffff">
+    <title>Caballo</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            min-height: 60vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #f0f0f0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            overflow: hidden; /* Prevents scrollbars from popping animations */
+        }
+        .button-3d {
+            width: 200px;
+            height: 200px;
+            background: #ffffff;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 80px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            touch-action: manipulation;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2), 0 6px 10px rgba(0, 0, 0, 0.15), inset 0 -3px 0 rgba(0, 0, 0, 0.1);
+            transition: transform 0.1s;
+        }
+        .button-3d:active {
+            transform: translateY(4px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2), 0 2px 4px rgba(0, 0, 0, 0.15), inset 0 -1px 0 rgba(0, 0, 0, 0.1);
+        }
+        .emoji { user-select: none; }
+        
+        /* The floating horse animation */
+        .animated-horse {
+            position: fixed;
+            font-size: 40px;
+            pointer-events: none;
+            z-index: 1000;
+            opacity: 0;
+            user-select: none;
+        }
+        @keyframes horsePop {
+            0% { opacity: 0; transform: translateY(100px) scale(0.5); }
+            20% { opacity: 1; transform: translateY(0) scale(1.2); }
+            40% { transform: translateY(-20px) translateX(10px) scale(1); }
+            60% { transform: translateY(-10px) translateX(-15px) scale(1.1); }
+            80% { transform: translateY(-30px) translateX(20px) scale(0.9); }
+            100% { opacity: 0; transform: translateY(-50px) translateX(0) scale(0.5); }
+        }
+        .animated-horse.show { animation: horsePop 2s ease-out forwards; }
+
+        .personal-counter {
+            position: absolute;
+            top: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 8px 12px;
+            border-radius: 20px;
+            font-size: 15px;
+            font-weight: bold;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            user-select: none;
+        }
+
+        .unmute-notification {
+            position: fixed;
+            bottom: 42px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.9);
+            padding: 8px 16px;
+            border-radius: 16px;
+            font-size: 14px;
+            color: #333;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            user-select: none;
+            white-space: nowrap;
+        }
+
+        /* Dark Mode Support */
+        @media (prefers-color-scheme: dark) {
+            body { background: #1a1a1a; }
+            .button-3d { 
+                background: #2d2d2d; 
+                box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4), 0 6px 10px rgba(0, 0, 0, 0.3), inset 0 -3px 0 rgba(0, 0, 0, 0.2);
+            }
+            .personal-counter, .unmute-notification { background: rgba(45, 45, 45, 0.9); color: white; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="personal-counter" id="personalCounter">My Clicks: 0</div>
+    
+    <button class="button-3d" id="emojiButton">
+        <span class="emoji">🐎</span>
+    </button>
+    
+    <div class="unmute-notification" id="muteMsg">Unmute your phone if you don't hear sound 🔊</div>
+
+    <script>
+        const button = document.getElementById('emojiButton');
+        const personalCounter = document.getElementById('personalCounter');
+        let personalClickCount = 0;
+        
+        // --- AUDIO SETUP ---
+        // You need a file named 'caballo.mp3' in the same folder as this file.
+        const audioFile = 'caballo.mp3'; 
+        const audioPool = [];
+        const poolSize = 5;
+        let currentAudioIndex = 0;
+
+        // Create a pool of audio objects so clicks can overlap rapidly
+        for (let i = 0; i < poolSize; i++) {
+            const audio = new Audio(audioFile);
+            audio.preload = 'auto';
+            audioPool.push(audio);
+        }
+
+        function loadPersonalClickCount() {
+            const saved = localStorage.getItem('caballoClickCount');
+            personalClickCount = saved ? parseInt(saved, 10) : 0;
+            updatePersonalCounterDisplay();
+        }
+
+        function savePersonalClickCount() {
+            localStorage.setItem('caballoClickCount', personalClickCount.toString());
+        }
+
+        function updatePersonalCounterDisplay() {
+            const formatter = new Intl.NumberFormat('en-US');
+            personalCounter.textContent = `My Clicks: ${formatter.format(personalClickCount)}`;
+        }
+
+        function createAnimatedHorse() {
+            const horse = document.createElement('div');
+            horse.className = 'animated-horse';
+            horse.textContent = '🐎';
+            
+            // Random position
+            const x = Math.random() * (window.innerWidth - 100);
+            const y = Math.random() * (window.innerHeight * 0.6) + (window.innerHeight * 0.2);
+            
+            horse.style.left = x + 'px';
+            horse.style.top = y + 'px';
+            
+            document.body.appendChild(horse);
+            
+            setTimeout(() => horse.classList.add('show'), 10);
+            setTimeout(() => {
+                if (horse.parentNode) document.body.removeChild(horse);
+            }, 2000);
+        }
+
+        async function playSound() {
+            const audio = audioPool[currentAudioIndex];
+            
+            // Reset this specific audio track if it's currently playing
+            if (!audio.paused) {
+                audio.pause();
+                audio.currentTime = 0;
+            }
+            
+            try {
+                await audio.play();
+            } catch (error) {
+                console.log("Audio play failed (user interaction usually required first).");
+            }
+
+            // Cycle to the next audio track in the pool
+            currentAudioIndex = (currentAudioIndex + 1) % poolSize;
+        }
+
+        button.addEventListener('click', () => {
+            playSound();
+            createAnimatedHorse();
+            personalClickCount++;
+            updatePersonalCounterDisplay();
+            savePersonalClickCount();
+            
+            // Hide the unmute message after first click
+            document.getElementById('muteMsg').style.display = 'none';
+        });
+
+        // Load saved clicks on startup
+        window.addEventListener('load', () => {
+            loadPersonalClickCount();
+        });
+    </script>
+</body>
+</html>
