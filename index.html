@@ -114,6 +114,11 @@
         // This works better on iOS than standard Audio elements
         const AudioContext = window.AudioContext || window.webkitAudioContext;
         const audioCtx = new AudioContext();
+
+        if ('audioSession' in navigator) {
+         navigator.audioSession.type = 'playback';
+        }
+        
         let horseBuffer = null;
 
         // 1. Fetch and decode the MP3 into memory immediately
