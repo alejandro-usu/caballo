@@ -16,23 +16,112 @@
             background: #f0f0f0;
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             overflow-x: hidden;
-            padding-top: 50px;
+            padding-top: 40px;
+            gap: 30px; 
         }
-        
-        /* The main button wrapper */
-        .button-container {
-            flex-grow: 1;
+
+        /* --- NEW MODAL STYLES --- */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(5px);
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 40vh;
+            z-index: 2000;
+        }
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 16px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            width: 90%;
+            max-width: 350px;
+            animation: modalPop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        @keyframes modalPop {
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .modal-content h2 { margin-bottom: 10px; font-size: 1.5rem; color: #111; }
+        .modal-content p { margin-bottom: 20px; color: #666; font-size: 0.95rem; }
+        .modal-input {
+            width: 100%;
+            padding: 12px 15px;
+            margin-bottom: 20px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.2s;
+            font-family: inherit;
+        }
+        .modal-input:focus { border-color: #888; }
+        .modal-btn {
+            background: #111;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 1rem;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            transition: transform 0.1s, background 0.2s;
+        }
+        .modal-btn:hover { background: #333; }
+        .modal-btn:active { transform: scale(0.98); }
+        
+        /* UI Elements */
+        .stats-container {
+            text-align: center;
+            z-index: 10;
+        }
+        
+        .global-counter {
+            font-size: 4.5rem; 
+            font-weight: 900;
+            margin-bottom: 5px;
+            color: #111;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            line-height: 1;
+        }
+        
+        .personal-counter {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .reset-button {
+            background: transparent;
+            border: none;
+            color: #d9534f;
+            font-size: 13px;
+            cursor: pointer;
+            text-decoration: underline;
+            opacity: 0.7;
+            transition: opacity 0.2s;
+        }
+        .reset-button:hover {
+            opacity: 1;
+            color: #c9302c;
+        }
+
+        .button-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
 
         .button-3d {
             width: 200px;
             height: 200px;
             background: #ffffff;
-            border: none;
+            border: 4px solid #f9f9f9; 
             border-radius: 50%;
             cursor: pointer;
             font-size: 80px;
@@ -40,16 +129,19 @@
             justify-content: center;
             align-items: center;
             touch-action: manipulation;
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2), 0 6px 10px rgba(0, 0, 0, 0.15), inset 0 -3px 0 rgba(0, 0, 0, 0.1);
-            transition: transform 0.1s;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15), inset 0 -3px 0 rgba(0, 0, 0, 0.05);
+            transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.15s;
+        }
+        .button-3d:hover {
+            transform: scale(1.05);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2), inset 0 -3px 0 rgba(0, 0, 0, 0.05);
         }
         .button-3d:active {
-            transform: translateY(4px);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2), 0 2px 4px rgba(0, 0, 0, 0.15), inset 0 -1px 0 rgba(0, 0, 0, 0.1);
+            transform: translateY(4px) scale(0.98); 
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15), inset 0 -1px 0 rgba(0, 0, 0, 0.05);
         }
         .emoji { user-select: none; }
         
-        /* The floating horse animation */
         .animated-horse {
             position: fixed;
             font-size: 40px;
@@ -68,43 +160,26 @@
         }
         .animated-horse.show { animation: horsePop 2s ease-out forwards; }
 
-        /* UI Elements */
-        .stats-container {
-            text-align: center;
-            margin-bottom: 20px;
-            z-index: 10;
-        }
-        .global-counter {
-            font-size: 2rem;
-            font-weight: bold;
-            margin-bottom: 10px;
-        }
-        .personal-counter {
-            background: rgba(255, 255, 255, 0.9);
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 15px;
-            font-weight: bold;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            display: inline-block;
-        }
-
-        /* Leaderboard */
         .leaderboard {
-            margin-top: 20px;
-            margin-bottom: 40px;
             background: white;
             padding: 20px;
             border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
             width: 90%;
             max-width: 300px;
             z-index: 10;
+            margin-bottom: 40px;
         }
         .leaderboard h3 {
             text-align: center;
+            margin-bottom: 5px;
+        }
+        .leaderboard-subtitle {
+            text-align: center;
+            font-size: 0.85rem;
+            color: #888;
             margin-bottom: 15px;
-            border-bottom: 2px solid #eee;
+            border-bottom: 2px solid #f0f0f0;
             padding-bottom: 10px;
         }
         .leaderboard ol {
@@ -116,46 +191,47 @@
             font-weight: normal;
         }
 
-        .reset-button {
-            margin-top: 10px;
-            background: transparent;
-            border: 1px solid #ccc;
-            color: #666;
-            padding: 4px 10px;
-            border-radius: 12px;
-            font-size: 12px;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-        .reset-button:hover {
-            background: #ffebeb;
-            border-color: #ffcccc;
-            color: #d9534f;
-        }
-
         /* Dark Mode Support */
         @media (prefers-color-scheme: dark) {
             body { background: #1a1a1a; color: white; }
+            .global-counter { color: #fff; }
+            .personal-counter { color: #aaa; }
+            .leaderboard-subtitle { color: #777; border-bottom-color: #333; }
             .button-3d { 
                 background: #2d2d2d; 
-                box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4), 0 6px 10px rgba(0, 0, 0, 0.3), inset 0 -3px 0 rgba(0, 0, 0, 0.2);
+                border-color: #333;
+                box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4), inset 0 -3px 0 rgba(0, 0, 0, 0.2);
             }
-            .personal-counter, .leaderboard { 
-                background: rgba(45, 45, 45, 0.9); 
-                color: white; 
-            }
-            .leaderboard h3 { border-bottom-color: #444; }
-
-            .reset-button { color: #aaa; border-color: #555; }
+            .button-3d:hover { box-shadow: 0 15px 30px rgba(0, 0, 0, 0.5), inset 0 -3px 0 rgba(0, 0, 0, 0.2); }
+            .leaderboard { background: rgba(45, 45, 45, 0.9); color: white; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
+            .reset-button { color: #ff6b6b; }
+            .reset-button:hover { color: #ff4c4c; }
+            
+            /* Dark Mode Modal */
+            .modal-content { background: #2d2d2d; color: white; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+            .modal-content h2 { color: white; }
+            .modal-content p { color: #bbb; }
+            .modal-input { background: #1a1a1a; color: white; border-color: #444; }
+            .modal-input:focus { border-color: #777; }
+            .modal-btn { background: #f0f0f0; color: #111; }
+            .modal-btn:hover { background: #ccc; }
         }
     </style>
 </head>
 <body>
 
+    <div class="modal-overlay" id="nameModal" style="display: none;">
+        <div class="modal-content">
+            <h2>Welcome Jockey!</h2>
+            <p>Enter your nickname for the leaderboard:</p>
+            <input type="text" id="nameInput" class="modal-input" placeholder="e.g. Secretariat" maxlength="20" autocomplete="off">
+            <button id="nameSubmitBtn" class="modal-btn">Let's Go!</button>
+        </div>
+    </div>
+
     <div class="stats-container">
-        <div class="global-counter">Total: <span id="globalCountDisplay">0</span></div>
+        <div class="global-counter" id="globalCountDisplay">0</div>
         <div class="personal-counter" id="personalCounter">My Clicks: 0</div>
-        <br>
         <button id="resetLocalBtn" class="reset-button">Reset My Clicks</button>
     </div>
     
@@ -167,6 +243,7 @@
 
     <div class="leaderboard">
         <h3>Top Caballos</h3>
+        <div class="leaderboard-subtitle">Keep clicking to climb the ranks!</div>
         <ol id="leaderboard-list">
             <li>Loading...</li>
         </ol>
@@ -190,18 +267,38 @@
         const globalRef = database.ref('globalClicks');
         const usersRef = database.ref('users');
 
-        // --- 2. IDENTITY SETUP ---
-let myName = localStorage.getItem('caballoNickname');
+        // --- 2. IDENTITY SETUP (UPDATED FOR MODAL) ---
+        let myName = localStorage.getItem('caballoNickname');
+        const nameModal = document.getElementById('nameModal');
+        const nameInput = document.getElementById('nameInput');
+        const nameSubmitBtn = document.getElementById('nameSubmitBtn');
 
-if (!myName) {
-    myName = prompt("Enter your Jockey Name:") || "Anonymous Horse";
-}
+        function saveAndStart(rawName) {
+            let cleanName = rawName.trim() || "Anonymous Horse";
+            // Sanitize illegal Firebase characters
+            cleanName = cleanName.replace(/[.#$\[\]]/g, "-");
+            localStorage.setItem('caballoNickname', cleanName);
+            myName = cleanName;
+            nameModal.style.display = 'none';
+        }
 
-// THE FIX: Swap illegal Firebase characters (. # $ [ ]) with a dash (-)
-myName = myName.replace(/[.#$\[\]]/g, "-");
+        if (!myName) {
+            // Show the modal if no name is found in memory
+            nameModal.style.display = 'flex';
+            nameInput.focus();
 
-// Save the clean name back to the browser
-localStorage.setItem('caballoNickname', myName);
+            // Handle button click
+            nameSubmitBtn.addEventListener('click', () => {
+                saveAndStart(nameInput.value);
+            });
+
+            // Handle pressing the 'Enter' key
+            nameInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    saveAndStart(nameInput.value);
+                }
+            });
+        }
 
         // --- 3. UI ELEMENTS & LOCAL VARS ---
         const button = document.getElementById('emojiButton');
@@ -217,16 +314,14 @@ localStorage.setItem('caballoNickname', myName);
         }
         
         let horseBuffer = null;
-        let secretHorseBuffer = null; // NEW: The secret buffer
+        let secretHorseBuffer = null; 
 
-        // Load the normal sound
         fetch('caballo.mp3')
             .then(response => response.arrayBuffer())
             .then(arrayBuffer => audioCtx.decodeAudioData(arrayBuffer))
             .then(decodedAudio => horseBuffer = decodedAudio)
             .catch(e => console.error("Error loading normal audio:", e));
 
-        // NEW: Load the secret sound
         fetch('horse.mp3') 
             .then(response => response.arrayBuffer())
             .then(arrayBuffer => audioCtx.decodeAudioData(arrayBuffer))
@@ -273,9 +368,7 @@ localStorage.setItem('caballoNickname', myName);
                 audioCtx.resume();
             }
             
-            // NEW: Choose the correct audio buffer
             const bufferToPlay = playSecret ? secretHorseBuffer : horseBuffer;
-            
             if (!bufferToPlay) return; 
 
             const source = audioCtx.createBufferSource();
@@ -284,7 +377,7 @@ localStorage.setItem('caballoNickname', myName);
             source.start(0);
         }
 
-        // --- 6. FIREBASE LISTENERS (Updates UI automatically) ---
+        // --- 6. FIREBASE LISTENERS ---
         globalRef.on('value', (snapshot) => {
             const count = snapshot.val() || 0;
             document.getElementById('globalCountDisplay').innerText = count.toLocaleString();
@@ -308,20 +401,15 @@ localStorage.setItem('caballoNickname', myName);
 
         // --- 7. THE CLICK EVENT ---
         button.addEventListener('click', (e) => {
-            
-            // 1. Add the click immediately
+            // Safety check: Prevent clicks if they somehow bypassed the modal
+            if (!myName) return;
+
             personalClickCount++;
             
-            // 2. THE EASTER EGG MATH (Modulo)
-            // If the count divided by 100 leaves a remainder of 0, it's a multiple of 100!
             const isEasterEgg = (personalClickCount % 100 === 0);
-            
-            // 3. Play sound (pass true if it's the 100th click, false otherwise)
             playSound(isEasterEgg);
-            
             createAnimatedHorse();
 
-            // 4. Update the screen and local storage
             updatePersonalCounterDisplay();
             savePersonalClickCount();
             
@@ -338,22 +426,14 @@ localStorage.setItem('caballoNickname', myName);
 
         // --- 8. RESET LOCAL CLICKS ---
         document.getElementById('resetLocalBtn').addEventListener('click', () => {
-            // Ask for confirmation so they don't click it by accident!
             const confirmReset = confirm("Are you sure you want to reset your personal clicks to 0?");
-            
             if (confirmReset) {
-                // 1. Reset the local variable
                 personalClickCount = 0;
-                
-                // 2. Update the screen
                 updatePersonalCounterDisplay();
-                
-                // 3. Delete it from the browser's memory
                 localStorage.removeItem('caballoClickCount');
             }
         });
 
-        // Load saved clicks on startup
         window.addEventListener('load', () => {
             loadPersonalClickCount();
         });
