@@ -205,10 +205,12 @@
 
         .running-horse {
             position: absolute;
-            font-size: 30px; /* Adjust size as needed */
+            /* Changed font-size to width for the image */
+            width: 70px; 
             opacity: 0.9;
             user-select: none;
-            /* Using a complex animation that moves along the edges */
+            /* Ensure the image can't be dragged by accident */
+            pointer-events: none; 
             animation: gallopBorder 15s linear infinite;
         }
 
@@ -279,8 +281,8 @@
     </div>
 
     <div class="running-horse-boundary">
-    <div class="running-horse">🐎</div>
-</div>
+        <img src="horse-fat.gif" class="running-horse" alt="Fat Horse">
+    </div>
     
     <div class="button-container">
         <button class="button-3d" id="emojiButton">
