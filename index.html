@@ -214,25 +214,32 @@
             animation: gallopBorder 15s linear infinite;
         }
 
-        /* GALLOP ANIMATION ALONG THE BORDER (Fixed Boundaries & Orientation) */
+        /* GALLOP ANIMATION ALONG THE BORDER (Smooth Corners & Pure Rotation) */
         @keyframes gallopBorder {
-            /* Running Right (Top Edge) - scaleX(-1) flips it to face forward */
-            0%      { top: 25px; left: 25px; transform: translate(-50%, -50%) scaleX(-1); }
-            24.9%   { top: 25px; left: calc(100% - 25px); transform: translate(-50%, -50%) scaleX(-1); }
+            /* TOP EDGE: Run Right */
+            0%   { top: 25px; left: 25px; transform: translate(-50%, -50%) rotate(180deg); }
+            23%  { top: 25px; left: calc(100% - 25px); transform: translate(-50%, -50%) rotate(180deg); }
             
-            /* Running Down (Right Edge) */
-            25%     { top: 25px; left: calc(100% - 25px); transform: translate(-50%, -50%) rotate(-90deg); }
-            49.9%   { top: calc(100% - 25px); left: calc(100% - 25px); transform: translate(-50%, -50%) rotate(-90deg); }
+            /* CORNER: Smooth Pivot Down */
+            25%  { top: 25px; left: calc(100% - 25px); transform: translate(-50%, -50%) rotate(270deg); }
             
-            /* Running Left (Bottom Edge) */
-            50%     { top: calc(100% - 25px); left: calc(100% - 25px); transform: translate(-50%, -50%) rotate(0deg); }
-            74.9%   { top: calc(100% - 25px); left: 25px; transform: translate(-50%, -50%) rotate(0deg); }
+            /* RIGHT EDGE: Run Down */
+            48%  { top: calc(100% - 25px); left: calc(100% - 25px); transform: translate(-50%, -50%) rotate(270deg); }
             
-            /* Running Up (Left Edge) */
-            75%     { top: calc(100% - 25px); left: 25px; transform: translate(-50%, -50%) rotate(90deg); }
-            99.9%   { top: 25px; left: 25px; transform: translate(-50%, -50%) rotate(90deg); }
+            /* CORNER: Smooth Pivot Left */
+            50%  { top: calc(100% - 25px); left: calc(100% - 25px); transform: translate(-50%, -50%) rotate(360deg); }
             
-            100%    { top: 25px; left: 25px; transform: translate(-50%, -50%) scaleX(-1); }
+            /* BOTTOM EDGE: Run Left */
+            73%  { top: calc(100% - 25px); left: 25px; transform: translate(-50%, -50%) rotate(360deg); }
+            
+            /* CORNER: Smooth Pivot Up */
+            75%  { top: calc(100% - 25px); left: 25px; transform: translate(-50%, -50%) rotate(450deg); }
+            
+            /* LEFT EDGE: Run Up */
+            98%  { top: 25px; left: 25px; transform: translate(-50%, -50%) rotate(450deg); }
+            
+            /* CORNER: Smooth Pivot Right (Completes the 360 loop) */
+            100% { top: 25px; left: 25px; transform: translate(-50%, -50%) rotate(540deg); }
         }
 
         /* Dark Mode Support */
