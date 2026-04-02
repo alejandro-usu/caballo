@@ -217,14 +217,21 @@ localStorage.setItem('caballoNickname', myName);
         }
         
         let horseBuffer = null;
+        let secretHorseBuffer = null; // NEW: The secret buffer
 
+        // Load the normal sound
         fetch('caballo.mp3')
             .then(response => response.arrayBuffer())
             .then(arrayBuffer => audioCtx.decodeAudioData(arrayBuffer))
-            .then(decodedAudio => {
-                horseBuffer = decodedAudio;
-            })
-            .catch(e => console.error("Error loading audio:", e));
+            .then(decodedAudio => horseBuffer = decodedAudio)
+            .catch(e => console.error("Error loading normal audio:", e));
+
+        // NEW: Load the secret sound
+        fetch('horse.mp3') 
+            .then(response => response.arrayBuffer())
+            .then(arrayBuffer => audioCtx.decodeAudioData(arrayBuffer))
+            .then(decodedAudio => secretHorseBuffer = decodedAudio)
+            .catch(e => console.error("Error loading secret audio:", e));
 
         // --- 5. FUNCTIONS ---
         function loadPersonalClickCount() {
@@ -261,14 +268,18 @@ localStorage.setItem('caballoNickname', myName);
             }, 2000);
         }
 
-        function playSound() {
+        function playSound(playSecret = false) {
             if (audioCtx.state === 'suspended') {
                 audioCtx.resume();
             }
-            if (!horseBuffer) return; 
+            
+            // NEW: Choose the correct audio buffer
+            const bufferToPlay = playSecret ? secretHorseBuffer : horseBuffer;
+            
+            if (!bufferToPlay) return; 
 
             const source = audioCtx.createBufferSource();
-            source.buffer = horseBuffer;
+            source.buffer = bufferToPlay;
             source.connect(audioCtx.destination);
             source.start(0);
         }
@@ -297,11 +308,20 @@ localStorage.setItem('caballoNickname', myName);
 
         // --- 7. THE CLICK EVENT ---
         button.addEventListener('click', (e) => {
-            playSound();
-            createAnimatedHorse();
             
-
+            // 1. Add the click immediately
             personalClickCount++;
+            
+            // 2. THE EASTER EGG MATH (Modulo)
+            // If the count divided by 100 leaves a remainder of 0, it's a multiple of 100!
+            const isEasterEgg = (personalClickCount % 100 === 0);
+            
+            // 3. Play sound (pass true if it's the 100th click, false otherwise)
+            playSound(isEasterEgg);
+            
+            createAnimatedHorse();
+
+            // 4. Update the screen and local storage
             updatePersonalCounterDisplay();
             savePersonalClickCount();
             
