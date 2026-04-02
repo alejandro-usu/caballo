@@ -212,17 +212,25 @@
             animation: gallopBorder 15s linear infinite;
         }
 
-        /* GALLOP ANIMATION ALONG THE BORDER */
+        /* GALLOP ANIMATION ALONG THE BORDER (Fixed Boundaries & Orientation) */
         @keyframes gallopBorder {
-            0% { transform: translate(-50%, -50%) rotate(0deg); left: 0; top: 0; }
-            /* Top Edge (Left to Right) */
-            25% { transform: translate(50%, -50%) rotate(0deg); left: 100%; top: 0; }
-            /* Right Edge (Top to Bottom) */
-            50% { transform: translate(50%, 50%) rotate(90deg); left: 100%; top: 100%; }
-            /* Bottom Edge (Right to Left) */
-            75% { transform: translate(-50%, 50%) rotate(180deg); left: 0; top: 100%; }
-            /* Left Edge (Bottom to Top) */
-            100% { transform: translate(-50%, -50%) rotate(270deg); left: 0; top: 0; }
+            /* Running Right (Top Edge) - scaleX(-1) flips it to face forward */
+            0%      { top: 25px; left: 25px; transform: translate(-50%, -50%) scaleX(-1); }
+            24.9%   { top: 25px; left: calc(100% - 25px); transform: translate(-50%, -50%) scaleX(-1); }
+            
+            /* Running Down (Right Edge) */
+            25%     { top: 25px; left: calc(100% - 25px); transform: translate(-50%, -50%) rotate(-90deg); }
+            49.9%   { top: calc(100% - 25px); left: calc(100% - 25px); transform: translate(-50%, -50%) rotate(-90deg); }
+            
+            /* Running Left (Bottom Edge) */
+            50%     { top: calc(100% - 25px); left: calc(100% - 25px); transform: translate(-50%, -50%) rotate(0deg); }
+            74.9%   { top: calc(100% - 25px); left: 25px; transform: translate(-50%, -50%) rotate(0deg); }
+            
+            /* Running Up (Left Edge) */
+            75%     { top: calc(100% - 25px); left: 25px; transform: translate(-50%, -50%) rotate(90deg); }
+            99.9%   { top: 25px; left: 25px; transform: translate(-50%, -50%) rotate(90deg); }
+            
+            100%    { top: 25px; left: 25px; transform: translate(-50%, -50%) scaleX(-1); }
         }
 
         /* Dark Mode Support */
