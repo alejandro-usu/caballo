@@ -116,6 +116,23 @@
             font-weight: normal;
         }
 
+        .reset-button {
+            margin-top: 10px;
+            background: transparent;
+            border: 1px solid #ccc;
+            color: #666;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .reset-button:hover {
+            background: #ffebeb;
+            border-color: #ffcccc;
+            color: #d9534f;
+        }
+
         /* Dark Mode Support */
         @media (prefers-color-scheme: dark) {
             body { background: #1a1a1a; color: white; }
@@ -128,6 +145,8 @@
                 color: white; 
             }
             .leaderboard h3 { border-bottom-color: #444; }
+
+            .reset-button { color: #aaa; border-color: #555; }
         }
     </style>
 </head>
@@ -136,6 +155,8 @@
     <div class="stats-container">
         <div class="global-counter">Total: <span id="globalCountDisplay">0</span></div>
         <div class="personal-counter" id="personalCounter">My Clicks: 0</div>
+        <br>
+        <button id="resetLocalBtn" class="reset-button">Reset My Clicks</button>
     </div>
     
     <div class="button-container">
@@ -293,6 +314,23 @@ localStorage.setItem('caballoNickname', myName);
                     lastClick: firebase.database.ServerValue.TIMESTAMP 
                 };
             });
+        });
+
+        // --- 8. RESET LOCAL CLICKS ---
+        document.getElementById('resetLocalBtn').addEventListener('click', () => {
+            // Ask for confirmation so they don't click it by accident!
+            const confirmReset = confirm("Are you sure you want to reset your personal clicks to 0?");
+            
+            if (confirmReset) {
+                // 1. Reset the local variable
+                personalClickCount = 0;
+                
+                // 2. Update the screen
+                updatePersonalCounterDisplay();
+                
+                // 3. Delete it from the browser's memory
+                localStorage.removeItem('caballoClickCount');
+            }
         });
 
         // Load saved clicks on startup
