@@ -1,22 +1,33 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐎</text></svg>" />
     <meta name="theme-color" content="#ffffff">
-    <title>Caballo</title>
+    <title>Caballo Clicker</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            min-height: 60vh;
+            min-height: 100vh;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
             background: #f0f0f0;
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            overflow: hidden; /* Prevents scrollbars from popping animations */
+            overflow-x: hidden;
+            padding-top: 50px;
         }
+        
+        /* The main button wrapper */
+        .button-container {
+            flex-grow: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 40vh;
+        }
+
         .button-3d {
             width: 200px;
             height: 200px;
@@ -57,21 +68,57 @@
         }
         .animated-horse.show { animation: horsePop 2s ease-out forwards; }
 
+        /* UI Elements */
+        .stats-container {
+            text-align: center;
+            margin-bottom: 20px;
+            z-index: 10;
+        }
+        .global-counter {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
         .personal-counter {
-            position: absolute;
-            top: 20px;
             background: rgba(255, 255, 255, 0.9);
-            padding: 8px 12px;
+            padding: 8px 16px;
             border-radius: 20px;
             font-size: 15px;
             font-weight: bold;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            user-select: none;
+            display: inline-block;
+        }
+
+        /* Leaderboard */
+        .leaderboard {
+            margin-top: 20px;
+            margin-bottom: 40px;
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            width: 90%;
+            max-width: 300px;
+            z-index: 10;
+        }
+        .leaderboard h3 {
+            text-align: center;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+        }
+        .leaderboard ol {
+            padding-left: 20px;
+            font-weight: bold;
+        }
+        .leaderboard li {
+            margin-bottom: 8px;
+            font-weight: normal;
         }
 
         .unmute-notification {
             position: fixed;
-            bottom: 42px;
+            bottom: 20px;
             left: 50%;
             transform: translateX(-50%);
             background: rgba(255, 255, 255, 0.9);
@@ -82,46 +129,86 @@
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             user-select: none;
             white-space: nowrap;
+            z-index: 100;
         }
 
         /* Dark Mode Support */
         @media (prefers-color-scheme: dark) {
-            body { background: #1a1a1a; }
+            body { background: #1a1a1a; color: white; }
             .button-3d { 
                 background: #2d2d2d; 
                 box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4), 0 6px 10px rgba(0, 0, 0, 0.3), inset 0 -3px 0 rgba(0, 0, 0, 0.2);
             }
-            .personal-counter, .unmute-notification { background: rgba(45, 45, 45, 0.9); color: white; }
+            .personal-counter, .unmute-notification, .leaderboard { 
+                background: rgba(45, 45, 45, 0.9); 
+                color: white; 
+            }
+            .leaderboard h3 { border-bottom-color: #444; }
         }
     </style>
 </head>
 <body>
 
-    <div class="personal-counter" id="personalCounter">My Clicks: 0</div>
+    <div class="stats-container">
+        <div class="global-counter">Total: <span id="globalCountDisplay">0</span></div>
+        <div class="personal-counter" id="personalCounter">My Clicks: 0</div>
+    </div>
     
-    <button class="button-3d" id="emojiButton">
-        <span class="emoji">🐎</span>
-    </button>
+    <div class="button-container">
+        <button class="button-3d" id="emojiButton">
+            <span class="emoji">🐎</span>
+        </button>
+    </div>
+
+    <div class="leaderboard">
+        <h3>Top Caballos</h3>
+        <ol id="leaderboard-list">
+            <li>Loading...</li>
+        </ol>
+    </div>
     
     <div class="unmute-notification" id="muteMsg">Unmute your phone if you don't hear sound 🔊</div>
 
-        <script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
+    <script>
+        // --- 1. FIREBASE SETUP ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyDzmvOq4TUKLxvqpV16GTAJoSi_8HFU4js",
+            authDomain: "caballo-clicker.firebaseapp.com",
+            projectId: "caballo-clicker",
+            storageBucket: "caballo-clicker.firebasestorage.app",
+            messagingSenderId: "22762918107",
+            appId: "1:22762918107:web:a6ce4fc5ccb162fda9c1be"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+        const globalRef = database.ref('globalClicks');
+        const usersRef = database.ref('users');
+
+        // --- 2. IDENTITY SETUP ---
+        let myName = localStorage.getItem('caballoNickname');
+        if (!myName) {
+            myName = prompt("Enter your Jockey Name:") || "Anonymous Horse";
+            localStorage.setItem('caballoNickname', myName);
+        }
+
+        // --- 3. UI ELEMENTS & LOCAL VARS ---
         const button = document.getElementById('emojiButton');
         const personalCounter = document.getElementById('personalCounter');
         let personalClickCount = 0;
         
-        // --- WEB AUDIO API SETUP (Zero Latency) ---
-        // This works better on iOS than standard Audio elements
+        // --- 4. WEB AUDIO API SETUP ---
         const AudioContext = window.AudioContext || window.webkitAudioContext;
         const audioCtx = new AudioContext();
 
         if ('audioSession' in navigator) {
-         navigator.audioSession.type = 'playback';
+            navigator.audioSession.type = 'playback';
         }
         
         let horseBuffer = null;
 
-        // 1. Fetch and decode the MP3 into memory immediately
         fetch('caballo.mp3')
             .then(response => response.arrayBuffer())
             .then(arrayBuffer => audioCtx.decodeAudioData(arrayBuffer))
@@ -130,6 +217,7 @@
             })
             .catch(e => console.error("Error loading audio:", e));
 
+        // --- 5. FUNCTIONS ---
         function loadPersonalClickCount() {
             const saved = localStorage.getItem('caballoClickCount');
             personalClickCount = saved ? parseInt(saved, 10) : 0;
@@ -150,7 +238,6 @@
             horse.className = 'animated-horse';
             horse.textContent = '🐎';
             
-            // Random position
             const x = Math.random() * (window.innerWidth - 100);
             const y = Math.random() * (window.innerHeight * 0.6) + (window.innerHeight * 0.2);
             
@@ -166,32 +253,59 @@
         }
 
         function playSound() {
-            // iOS requires the audio context to be "resumed" on a user interaction
             if (audioCtx.state === 'suspended') {
                 audioCtx.resume();
             }
+            if (!horseBuffer) return; 
 
-            if (!horseBuffer) return; // Don't play if audio hasn't loaded yet
-
-            // Create a "source" node (like a disposable player)
             const source = audioCtx.createBufferSource();
             source.buffer = horseBuffer;
             source.connect(audioCtx.destination);
             source.start(0);
         }
 
-        button.addEventListener('click', (e) => {
-            // Prevent default zooming/behavior on some touch devices
-            // e.preventDefault(); 
+        // --- 6. FIREBASE LISTENERS (Updates UI automatically) ---
+        globalRef.on('value', (snapshot) => {
+            const count = snapshot.val() || 0;
+            document.getElementById('globalCountDisplay').innerText = count.toLocaleString();
+        });
+
+        usersRef.orderByChild('score').limitToLast(5).on('value', (snapshot) => {
+            const list = document.getElementById('leaderboard-list');
+            list.innerHTML = ""; 
             
+            const players = [];
+            snapshot.forEach((child) => {
+                players.push({ name: child.key, score: child.val().score });
+            });
+
+            players.reverse().forEach((player) => {
+                const li = document.createElement('li');
+                li.innerText = `${player.name}: ${player.score.toLocaleString()}`;
+                list.appendChild(li);
+            });
+        });
+
+        // --- 7. THE CLICK EVENT ---
+        button.addEventListener('click', (e) => {
             playSound();
             createAnimatedHorse();
+            
+            document.getElementById('muteMsg').style.display = 'none';
+
             personalClickCount++;
             updatePersonalCounterDisplay();
             savePersonalClickCount();
             
-            // Hide the unmute message after first click
-            document.getElementById('muteMsg').style.display = 'none';
+            globalRef.transaction(c => (c || 0) + 1);
+
+            usersRef.child(myName).transaction((currentData) => {
+                const data = currentData || { score: 0, lastClick: 0 };
+                return {
+                    score: data.score + 1,
+                    lastClick: firebase.database.ServerValue.TIMESTAMP 
+                };
+            });
         });
 
         // Load saved clicks on startup
