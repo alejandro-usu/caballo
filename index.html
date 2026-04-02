@@ -281,6 +281,17 @@
         </div>
     </div>
 
+    <div class="modal-overlay" id="antiBotModal" style="display: none;">
+        <div class="modal-content">
+            <h2>Hold Your Horses! 🛑</h2>
+            <p>To prove you aren't an auto-clicker, answer this horse fact:</p>
+            <p id="triviaQuestion" style="font-weight: bold; font-size: 1.1rem; margin-bottom: 15px;"></p>
+            <input type="text" id="triviaInput" class="modal-input" placeholder="Your answer..." autocomplete="off">
+            <p id="triviaError" style="color: #d9534f; font-size: 0.85rem; display: none; margin-top: -10px; margin-bottom: 10px;">Incorrect! Try again.</p>
+            <button id="triviaSubmitBtn" class="modal-btn">Verify</button>
+        </div>
+    </div>
+
     <div class="stats-container">
         <div class="global-counter" id="globalCountDisplay">0</div>
         <div class="personal-counter" id="personalCounter">My Clicks: 0</div>
@@ -459,6 +470,7 @@
         button.addEventListener('click', (e) => {
             // Safety check: Prevent clicks if they somehow bypassed the modal
             if (!myName) return;
+            if (antiBotModal.style.display === 'flex') return; // NEW: Blocks clicks while modal is open!
 
             personalClickCount++;
             
@@ -479,6 +491,58 @@
                 };
             });
         });
+
+        // --- ANTI-BOT TRIVIA LOGIC ---
+        const antiBotModal = document.getElementById('antiBotModal');
+        const triviaQuestionEl = document.getElementById('triviaQuestion');
+        const triviaInput = document.getElementById('triviaInput');
+        const triviaSubmitBtn = document.getElementById('triviaSubmitBtn');
+        const triviaError = document.getElementById('triviaError');
+
+        let currentTriviaAnswer = [];
+
+        // The array of questions and acceptable answers (lowercase)
+        const horseTrivia = [
+            { q: "What do you call a baby horse?", a: ["foal"] },
+            { q: "What do you call a mature female horse?", a: ["mare"] },
+            { q: "What do you call a mature male horse?", a: ["stallion"] },
+            { q: "How many toes does a horse have on each foot?", a: ["1", "one"] },
+            { q: "What measurement is used to measure a horse's height?", a: ["hand", "hands"] },
+            { q: "True or False: Horses can sleep standing up.", a: ["true", "t"] }
+        ];
+
+        function triggerBotCheck() {
+            if (!myName) return; // Don't trigger if they haven't picked a name yet
+            
+            // Pick a random question
+            const randomFact = horseTrivia[Math.floor(Math.random() * horseTrivia.length)];
+            triviaQuestionEl.textContent = randomFact.q;
+            currentTriviaAnswer = randomFact.a.map(ans => ans.toLowerCase());
+            
+            // Reset the input and show the modal
+            triviaInput.value = "";
+            triviaError.style.display = "none";
+            antiBotModal.style.display = "flex";
+            triviaInput.focus();
+        }
+
+        function verifyTrivia() {
+            const userAnswer = triviaInput.value.trim().toLowerCase();
+            if (currentTriviaAnswer.includes(userAnswer)) {
+                antiBotModal.style.display = "none"; // Correct! Hide modal.
+            } else {
+                triviaError.style.display = "block"; // Wrong! Show error.
+            }
+        }
+
+        // Listen for clicks or the Enter key
+        triviaSubmitBtn.addEventListener('click', verifyTrivia);
+        triviaInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') verifyTrivia();
+        });
+
+        // Trigger the pop-up every 5 minutes (300,000 milliseconds)
+        setInterval(triggerBotCheck, 300000);
 
         // --- 8. RESET LOCAL CLICKS ---
         document.getElementById('resetLocalBtn').addEventListener('click', () => {
