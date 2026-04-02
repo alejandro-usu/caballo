@@ -191,6 +191,40 @@
             font-weight: normal;
         }
 
+        /* THE RUNNING HORSE BOUNDARY */
+        .running-horse-boundary {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none; /* Make sure it doesn't block clicks */
+            z-index: 999; /* Float above everything except animated horses */
+            overflow: hidden;
+        }
+
+        .running-horse {
+            position: absolute;
+            font-size: 30px; /* Adjust size as needed */
+            opacity: 0.9;
+            user-select: none;
+            /* Using a complex animation that moves along the edges */
+            animation: gallopBorder 15s linear infinite;
+        }
+
+        /* GALLOP ANIMATION ALONG THE BORDER */
+        @keyframes gallopBorder {
+            0% { transform: translate(-50%, -50%) rotate(0deg); left: 0; top: 0; }
+            /* Top Edge (Left to Right) */
+            25% { transform: translate(50%, -50%) rotate(0deg); left: 100%; top: 0; }
+            /* Right Edge (Top to Bottom) */
+            50% { transform: translate(50%, 50%) rotate(90deg); left: 100%; top: 100%; }
+            /* Bottom Edge (Right to Left) */
+            75% { transform: translate(-50%, 50%) rotate(180deg); left: 0; top: 100%; }
+            /* Left Edge (Bottom to Top) */
+            100% { transform: translate(-50%, -50%) rotate(270deg); left: 0; top: 0; }
+        }
+
         /* Dark Mode Support */
         @media (prefers-color-scheme: dark) {
             body { background: #1a1a1a; color: white; }
@@ -215,6 +249,7 @@
             .modal-input:focus { border-color: #777; }
             .modal-btn { background: #f0f0f0; color: #111; }
             .modal-btn:hover { background: #ccc; }
+            .running-horse { opacity: 0.7; }
         }
     </style>
 </head>
@@ -234,6 +269,10 @@
         <div class="personal-counter" id="personalCounter">My Clicks: 0</div>
         <button id="resetLocalBtn" class="reset-button">Reset My Clicks</button>
     </div>
+
+    <div class="running-horse-boundary">
+    <div class="running-horse">🐎</div>
+</div>
     
     <div class="button-container">
         <button class="button-3d" id="emojiButton">
