@@ -284,11 +284,11 @@
     <div class="modal-overlay" id="antiBotModal" style="display: none;">
         <div class="modal-content">
             <h2>Hold Your Horses! 🛑</h2>
-            <p>To prove you aren't an auto-clicker, answer this horse fact:</p>
+            <p>Its random horse fact time:</p>
             <p id="triviaQuestion" style="font-weight: bold; font-size: 1.1rem; margin-bottom: 15px;"></p>
             <input type="text" id="triviaInput" class="modal-input" placeholder="Your answer..." autocomplete="off">
             <p id="triviaError" style="color: #d9534f; font-size: 0.85rem; display: none; margin-top: -10px; margin-bottom: 10px;">Incorrect! Try again.</p>
-            <button id="triviaSubmitBtn" class="modal-btn">Verify</button>
+            <button id="triviaSubmitBtn" class="modal-btn">Submit</button>
         </div>
     </div>
 
@@ -541,8 +541,8 @@
             if (e.key === 'Enter') verifyTrivia();
         });
 
-        // Trigger the pop-up every 5 minutes (300,000 milliseconds)
-        setInterval(triggerBotCheck, 300000);
+        // Trigger the pop-up every 10 minutes (600,000 milliseconds)
+        setInterval(triggerBotCheck, 600000);
 
         // --- 8. RESET LOCAL CLICKS ---
         document.getElementById('resetLocalBtn').addEventListener('click', () => {
