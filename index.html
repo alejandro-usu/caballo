@@ -116,22 +116,6 @@
             font-weight: normal;
         }
 
-        .unmute-notification {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(255, 255, 255, 0.9);
-            padding: 8px 16px;
-            border-radius: 16px;
-            font-size: 14px;
-            color: #333;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            user-select: none;
-            white-space: nowrap;
-            z-index: 100;
-        }
-
         /* Dark Mode Support */
         @media (prefers-color-scheme: dark) {
             body { background: #1a1a1a; color: white; }
@@ -139,7 +123,7 @@
                 background: #2d2d2d; 
                 box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4), 0 6px 10px rgba(0, 0, 0, 0.3), inset 0 -3px 0 rgba(0, 0, 0, 0.2);
             }
-            .personal-counter, .unmute-notification, .leaderboard { 
+            .personal-counter, .leaderboard { 
                 background: rgba(45, 45, 45, 0.9); 
                 color: white; 
             }
@@ -167,8 +151,6 @@
         </ol>
     </div>
     
-    <div class="unmute-notification" id="muteMsg">Unmute your phone if you don't hear sound 🔊</div>
-
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
@@ -297,7 +279,6 @@ localStorage.setItem('caballoNickname', myName);
             playSound();
             createAnimatedHorse();
             
-            document.getElementById('muteMsg').style.display = 'none';
 
             personalClickCount++;
             updatePersonalCounterDisplay();
