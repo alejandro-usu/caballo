@@ -188,11 +188,17 @@
         const usersRef = database.ref('users');
 
         // --- 2. IDENTITY SETUP ---
-        let myName = localStorage.getItem('caballoNickname');
-        if (!myName) {
-            myName = prompt("Enter your Jockey Name:") || "Anonymous Horse";
-            localStorage.setItem('caballoNickname', myName);
-        }
+let myName = localStorage.getItem('caballoNickname');
+
+if (!myName) {
+    myName = prompt("Enter your Jockey Name:") || "Anonymous Horse";
+}
+
+// THE FIX: Swap illegal Firebase characters (. # $ [ ]) with a dash (-)
+myName = myName.replace(/[.#$\[\]]/g, "-");
+
+// Save the clean name back to the browser
+localStorage.setItem('caballoNickname', myName);
 
         // --- 3. UI ELEMENTS & LOCAL VARS ---
         const button = document.getElementById('emojiButton');
