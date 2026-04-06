@@ -330,6 +330,14 @@
             appId: "1:22762918107:web:a6ce4fc5ccb162fda9c1be"
         };
         firebase.initializeApp(firebaseConfig);
+
+// --- NEW: ACTIVATE APP CHECK ---
+        const appCheck = firebase.appCheck();
+        appCheck.activate(
+            new firebase.appCheck.ReCaptchaV3Provider('6LfRBqosAAAAAH3EB0D7CkkwMc_knIsDgfdwY2Fk'),
+            true 
+        );
+        
         const database = firebase.database();
         const globalRef = database.ref('globalClicks');
         const usersRef = database.ref('users');
