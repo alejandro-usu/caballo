@@ -331,12 +331,13 @@
         };
         firebase.initializeApp(firebaseConfig);
 
-// --- NEW: ACTIVATE APP CHECK ---
+        // --- NEW: ACTIVATE APP CHECK ---
         const appCheck = firebase.appCheck();
         appCheck.activate(
-            new firebase.appCheck.ReCaptchaV3Provider('6LfRBqosAAAAAH3EB0D7CkkwMc_knIsDgfdwY2Fk'),
+            '6LfRBqosAAAAAH3EB0D7CkkwMc_knIsDgfdwY2Fk',
             true 
         );
+
         
         const database = firebase.database();
         const globalRef = database.ref('globalClicks');
