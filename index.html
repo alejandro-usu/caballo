@@ -323,13 +323,14 @@
     <script>
         // --- 1. FIREBASE SETUP ---
         const firebaseConfig = {
-            apiKey: "AIzaSyDzwvOq4TUkLXvqpv16GTAJoSi_8HFU4js",
-            authDomain: "caballo-clicker.firebaseapp.com",
-            projectId: "caballo-clicker",
-            storageBucket: "caballo-clicker.firebasestorage.app",
-            messagingSenderId: "22762918107",
-            appId: "1:22762918107:web:a6ce4fc5ccb162fda9c1be"
-        };
+  apiKey: "AIzaSyDzwvOq4TUkLXvqpv16GTAJoSi_8HFU4js",
+  authDomain: "caballo-clicker.firebaseapp.com",
+  databaseURL: "https://caballo-clicker-default-rtdb.firebaseio.com",
+  projectId: "caballo-clicker",
+  storageBucket: "caballo-clicker.firebasestorage.app",
+  messagingSenderId: "227629198107",
+  appId: "1:227629198107:web:a6ce4fc5ccb162fda9c1be"
+};
         firebase.initializeApp(firebaseConfig);
 
         // --- NEW: ACTIVATE APP CHECK ---
