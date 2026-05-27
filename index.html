@@ -191,6 +191,52 @@
             font-weight: normal;
         }
 
+        /* AUTH BUTTON */
+        .auth-button {
+            position: fixed;
+            top: 50%;
+            right: 20px;
+            transform: translateY(-50%);
+            background: white;
+            border: 2px solid #ddd;
+            border-radius: 30px;
+            padding: 12px 20px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #333;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            transition: transform 0.15s, box-shadow 0.15s, background 0.2s;
+            z-index: 100;
+            max-width: 240px;
+            text-align: center;
+            font-family: inherit;
+        }
+        .auth-button:hover {
+            transform: translateY(-50%) scale(1.05);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.12);
+        }
+        .auth-button:active { transform: translateY(-50%) scale(0.98); }
+
+        .auth-button.signed-in {
+            background: #f0f9f0;
+            border-color: #c8e6c8;
+            color: #2d6a2d;
+        }
+
+        @media (max-width: 768px) {
+            body { padding-bottom: 80px; }
+            .auth-button {
+                top: auto;
+                right: auto;
+                left: 50%;
+                bottom: 20px;
+                transform: translateX(-50%);
+            }
+            .auth-button:hover { transform: translateX(-50%) scale(1.05); }
+            .auth-button:active { transform: translateX(-50%) scale(0.98); }
+        }
+
         /* THE RUNNING HORSE BOUNDARY */
         .running-horse-boundary {
             position: fixed;
@@ -267,6 +313,18 @@
             .modal-btn { background: #f0f0f0; color: #111; }
             .modal-btn:hover { background: #ccc; }
             .running-horse { opacity: 0.7; }
+
+            /* Dark Mode Auth Button */
+            .auth-button {
+                background: #2d2d2d;
+                border-color: #444;
+                color: #ddd;
+            }
+            .auth-button.signed-in {
+                background: #1d3a1d;
+                border-color: #2d5a2d;
+                color: #a8d8a8;
+            }
         }
     </style>
 </head>
@@ -291,6 +349,10 @@
             <button id="triviaSubmitBtn" class="modal-btn">Submit</button>
         </div>
     </div>
+
+    <button class="auth-button" id="authButton">
+        <span id="authButtonText">Add a nickname to the leaderboard</span>
+    </button>
 
     <div class="stats-container">
         <div class="global-counter" id="globalCountDisplay">0</div>
@@ -352,31 +414,53 @@
         const nameSubmitBtn = document.getElementById('nameSubmitBtn');
 
         function saveAndStart(rawName) {
-            let cleanName = rawName.trim() || "Anonymous Horse";
+            const trimmed = rawName.trim();
+            if (!trimmed) {
+                // Empty input = stay anonymous, just close the modal
+                nameModal.style.display = 'none';
+                return;
+            }
             // Sanitize illegal Firebase characters
-            cleanName = cleanName.replace(/[.#$\[\]]/g, "-");
+            const cleanName = trimmed.replace(/[.#$\[\]]/g, "-");
             localStorage.setItem('caballoNickname', cleanName);
             myName = cleanName;
             nameModal.style.display = 'none';
+            updateAuthButtonDisplay();
         }
 
-        if (!myName) {
-            // Show the modal if no name is found in memory
-            nameModal.style.display = 'flex';
-            nameInput.focus();
-
-            // Handle button click
-            nameSubmitBtn.addEventListener('click', () => {
+        // Always wire up the modal handlers — modal opens on demand via the auth button
+        nameSubmitBtn.addEventListener('click', () => {
+            saveAndStart(nameInput.value);
+        });
+        nameInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
                 saveAndStart(nameInput.value);
-            });
+            }
+        });
 
-            // Handle pressing the 'Enter' key
-            nameInput.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') {
-                    saveAndStart(nameInput.value);
-                }
-            });
+        // --- AUTH BUTTON ---
+        const authButton = document.getElementById('authButton');
+        const authButtonText = document.getElementById('authButtonText');
+
+        function updateAuthButtonDisplay() {
+            if (myName) {
+                authButtonText.textContent = `Playing as: ${myName}`;
+                authButton.classList.add('signed-in');
+            } else {
+                authButtonText.textContent = 'Add a nickname to the leaderboard';
+                authButton.classList.remove('signed-in');
+            }
         }
+
+        authButton.addEventListener('click', () => {
+            // Pre-fill with current name so users can edit, or empty for first-timers
+            nameInput.value = myName || '';
+            nameModal.style.display = 'flex';
+            setTimeout(() => nameInput.focus(), 50);
+        });
+
+        // Initialize button state on load
+        updateAuthButtonDisplay();
 
         // --- 3. UI ELEMENTS & LOCAL VARS ---
         const button = document.getElementById('emojiButton');
@@ -479,28 +563,30 @@
 
         // --- 7. THE CLICK EVENT ---
         button.addEventListener('click', (e) => {
-            // Safety check: Prevent clicks if they somehow bypassed the modal
-            if (!myName) return;
-            if (antiBotModal.style.display === 'flex') return; // NEW: Blocks clicks while modal is open!
+            // Block clicks while trivia modal is open
+            if (antiBotModal.style.display === 'flex') return;
 
             personalClickCount++;
-            
+
             const isEasterEgg = (personalClickCount % 100 === 0);
             playSound(isEasterEgg);
             createAnimatedHorse();
 
             updatePersonalCounterDisplay();
             savePersonalClickCount();
-            
-            globalRef.transaction(c => (c || 0) + 1);
 
-            usersRef.child(myName).transaction((currentData) => {
-                const data = currentData || { score: 0, lastClick: 0 };
-                return {
-                    score: data.score + 1,
-                    lastClick: firebase.database.ServerValue.TIMESTAMP 
-                };
-            });
+            // Only sync to Firebase if the user has set a name
+            if (myName) {
+                globalRef.transaction(c => (c || 0) + 1);
+
+                usersRef.child(myName).transaction((currentData) => {
+                    const data = currentData || { score: 0, lastClick: 0 };
+                    return {
+                        score: data.score + 1,
+                        lastClick: firebase.database.ServerValue.TIMESTAMP
+                    };
+                });
+            }
         });
 
         // --- ANTI-BOT TRIVIA LOGIC ---
