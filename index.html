@@ -2,9 +2,10 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐎</text></svg>" />
-    <meta name="theme-color" content="#ffffff">
+    <meta name="theme-color" content="#f0f0f0" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#1a1a1a" media="(prefers-color-scheme: dark)">
     <title>Caballo Clicker</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -414,19 +415,22 @@
         const nameSubmitBtn = document.getElementById('nameSubmitBtn');
 
         function saveAndStart(rawName) {
-            const trimmed = rawName.trim();
-            if (!trimmed) {
-                // Empty input = stay anonymous, just close the modal
-                nameModal.style.display = 'none';
-                return;
-            }
-            // Sanitize illegal Firebase characters
-            const cleanName = trimmed.replace(/[.#$\[\]]/g, "-");
-            localStorage.setItem('caballoNickname', cleanName);
-            myName = cleanName;
-            nameModal.style.display = 'none';
-            updateAuthButtonDisplay();
-        }
+    const trimmed = rawName.trim();
+    if (!trimmed) {
+        nameModal.style.display = 'none';
+        return;
+    }
+    const cleanName = trimmed.replace(/[^A-Za-z0-9_ -]/g, "").trim().slice(0, 20);
+    if (!cleanName) {
+        nameInput.value = '';
+        nameInput.placeholder = 'Letters, numbers, spaces, _ and - only';
+        return;
+    }
+    localStorage.setItem('caballoNickname', cleanName);
+    myName = cleanName;
+    nameModal.style.display = 'none';
+    updateAuthButtonDisplay();
+}
 
         // Always wire up the modal handlers — modal opens on demand via the auth button
         nameSubmitBtn.addEventListener('click', () => {
